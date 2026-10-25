@@ -469,4 +469,116 @@
     h += D.text(160, 196, exo ? 'exothermic: heat released' : 'endothermic: heat absorbed', 't-m');
     return D.svg(300, 206, h, exo ? 'Exothermic enthalpy diagram' : 'Endothermic enthalpy diagram');
   };
+
+  /* ===== mechanical engineering ===== */
+  // simple triangular truss: pin at A (left), roller at B (right), apex C loaded by P
+  D.truss = function (o = {}) {
+    const th = o.deg || 40, A = [50, 170], B = [290, 170], h2 = 120 * Math.tan(rad(th)), C = [170, 170 - Math.min(130, h2)];
+    let h = '';
+    [[A, B], [A, C], [B, C]].forEach(([p, q]) => { h += D.line(p[0], p[1], q[0], q[1], 'ln') + D.line(p[0], p[1], q[0], q[1], 'thin'); });
+    [A, B, C].forEach((p) => { h += '<circle cx="' + r1(p[0]) + '" cy="' + r1(p[1]) + '" r="6" class="obj"/>'; });
+    h += '<polygon points="' + A[0] + ',' + (A[1] + 6) + ' ' + (A[0] - 12) + ',' + (A[1] + 26) + ' ' + (A[0] + 12) + ',' + (A[1] + 26) + '" class="obj2"/>' + D.line(A[0] - 20, A[1] + 27, A[0] + 20, A[1] + 27, 'ln');
+    h += '<polygon points="' + B[0] + ',' + (B[1] + 6) + ' ' + (B[0] - 12) + ',' + (B[1] + 22) + ' ' + (B[0] + 12) + ',' + (B[1] + 22) + '" class="obj2"/><circle cx="' + (B[0] - 6) + '" cy="' + (B[1] + 27) + '" r="4" class="obj"/><circle cx="' + (B[0] + 6) + '" cy="' + (B[1] + 27) + '" r="4" class="obj"/>' + D.line(B[0] - 20, B[1] + 32, B[0] + 20, B[1] + 32, 'ln');
+    h += D.arrow(C[0], C[1] - 62, C[0], C[1] - 9, 'c1') + D.text(C[0] + 10, C[1] - 56, o.P || 'P', 'c1 t-it', 'start');
+    h += D.text(A[0] - 14, A[1] - 12, 'A', 't-it') + D.text(B[0] + 14, B[1] - 12, 'B', 't-it') + D.text(C[0] - 16, C[1] - 4, 'C', 't-it');
+    h += D.arc(A[0], A[1], 34, 0, Math.atan2(A[1] - C[1], C[0] - A[0]) * 180 / Math.PI) + D.text(A[0] + 46, A[1] - 12, 'θ', 't-it');
+    return D.svg(340, 206, h, 'Triangular truss with a load P at the top joint');
+  };
+
+  // two meshing gears with tooth counts
+  D.gears = function (o = {}) {
+    const n1 = o.n1 || 12, n2 = o.n2 || 24, m = 3.2;
+    const r1g = n1 * m / 2 + 6, r2g = n2 * m / 2 + 6;
+    const cy = 20 + Math.max(r1g, r2g), c1 = 20 + r1g, c2 = c1 + r1g + r2g - 6;
+    const gear = (cx, r, n, lab, cls) => '<circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="' + r1(r) + '" class="' + cls + '" style="stroke-width:10;stroke-dasharray:' + r1((Math.PI * r) / n) + ' ' + r1((Math.PI * r) / n) + '"/><circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="' + r1(r - 5) + '" class="' + cls + '"/><circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="5" class="c4"/>' + D.text(cx, cy + 18, lab, 't-it');
+    let h = gear(c1, r1g, n1, (o.l1 || 'N₁ = ' + n1), 'obj2') + gear(c2, r2g, n2, (o.l2 || 'N₂ = ' + n2), 'obj');
+    h += '<path d="M' + r1(c1 - 16) + ' ' + r1(cy - r1g - 14) + ' A 26 26 0 0 1 ' + r1(c1 + 16) + ' ' + r1(cy - r1g - 14) + '" class="c2" style="fill:none;stroke-width:3"/>' + D.arrowA(c1 + 14, cy - r1g - 15, -30, 8, 'c2') + D.text(c1, cy - r1g - 34, o.w1 || 'ω_in', 'c2 t-it');
+    h += '<path d="M' + r1(c2 + 16) + ' ' + r1(cy - r2g - 14) + ' A 26 26 0 0 0 ' + r1(c2 - 16) + ' ' + r1(cy - r2g - 14) + '" class="c1" style="fill:none;stroke-width:3"/>' + D.arrowA(c2 - 14, cy - r2g - 15, 210, 8, 'c1') + D.text(c2, cy - r2g - 34, o.w2 || 'ω_out', 'c1 t-it');
+    return D.svg(r1(c2 + r2g + 24), r1(cy + Math.max(r1g, r2g) + 14), h, 'Two meshing spur gears; they turn in opposite directions');
+  };
+
+  // compound gear train: gear 1 drives 2; 2 and 3 share a shaft; 3 drives 4
+  D.train = function () {
+    let h = '';
+    const g = (cx, cy, r, lab, cls) => '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" class="' + cls + '" style="stroke-width:8;stroke-dasharray:4 4"/><circle cx="' + cx + '" cy="' + cy + '" r="' + (r - 4) + '" class="' + cls + '"/>' + D.text(cx, cy + r + 14, lab, 't-it');
+    h += g(50, 70, 22, '1', 'obj2') + g(122, 70, 48, '2', 'obj') + g(122, 70, 18, '', 'obj2') + D.text(122, 70, '3', 't-it') + g(184, 70, 42, '4', 'obj');
+    h += '<circle cx="122" cy="70" r="4" class="c4"/>' + D.text(122, 160, 'gears 2 & 3 share a shaft', 't-m');
+    h += D.text(50, 30, 'input', 't-m') + D.text(184, 14, 'output', 't-m');
+    return D.svg(250, 170, h, 'Compound gear train with gears 2 and 3 on a common shaft');
+  };
+
+  // stress–strain curve for a ductile metal
+  D.stressStrain = function () {
+    const ox = 44, oy = 186;
+    let h = D.arrow(ox, oy, 330, oy, 'thin', 7) + D.arrow(ox, oy, ox, 14, 'thin', 7) + D.text(322, oy + 14, 'strain ε', 't-m', 'end') + D.text(ox + 6, 18, 'stress σ', 't-m', 'start');
+    h += '<path d="M' + ox + ' ' + oy + ' L 84 70 Q 92 62 104 66 Q 150 72 200 44 Q 240 30 262 48 Q 282 66 296 96" class="c2" style="fill:none;stroke-width:3"/>';
+    h += '<circle cx="84" cy="70" r="4.5" class="c1"/>' + D.text(76, 58, 'yield S_y', 'c1', 'end');
+    h += '<circle cx="236" cy="33" r="4.5" class="c4"/>' + D.text(236, 20, 'ultimate S_u', 'c4');
+    h += '<text x="296" y="110" text-anchor="middle" class="t-m">fracture ×</text>';
+    h += D.text(58, 140, 'E = slope', 'c3', 'start') + D.text(150, oy - 10, 'plastic region', 't-m') + D.line(84, oy - 4, 84, oy + 4, 'thin');
+    return D.svg(340, 200, h, 'Stress–strain curve showing elastic slope E, yield strength, ultimate strength and fracture');
+  };
+
+  // pin in single or double shear
+  D.shear = function (o = {}) {
+    let h = '';
+    if (!o.double) {
+      h += '<rect x="20" y="40" width="170" height="24" rx="4" class="obj"/><rect x="110" y="64" width="170" height="24" rx="4" class="obj2"/>';
+      h += '<rect x="140" y="28" width="16" height="72" rx="3" class="fillgold" style="stroke:var(--fg);stroke-width:2"/>';
+      h += D.arrow(30, 52, -4 + 8, 52, 'c1') + D.arrow(270, 76, 304, 76, 'c1') + D.text(12, 36, 'F', 'c1 t-it') + D.text(296, 98, 'F', 'c1 t-it');
+      h += D.line(130, 64, 166, 64, 'c6') + D.text(200, 18, '1 shear plane', 'c6');
+    } else {
+      h += '<rect x="20" y="30" width="170" height="20" rx="4" class="obj"/><rect x="20" y="78" width="170" height="20" rx="4" class="obj"/><rect x="110" y="54" width="170" height="20" rx="4" class="obj2"/>';
+      h += '<rect x="140" y="20" width="16" height="88" rx="3" class="fillgold" style="stroke:var(--fg);stroke-width:2"/>';
+      h += D.arrow(270, 64, 304, 64, 'c1') + D.text(296, 86, 'F', 'c1 t-it') + D.arrow(30, 64, 6, 64, 'c1') + D.text(14, 50, 'F', 'c1 t-it');
+      h += D.line(130, 52, 166, 52, 'c6') + D.line(130, 76, 166, 76, 'c6') + D.text(210, 14, '2 shear planes', 'c6');
+    }
+    return D.svg(320, 120, h, o.double ? 'Pin in double shear' : 'Bolt in single shear');
+  };
+
+  // orthographic projection of a stepped block (third-angle)
+  D.ortho = function () {
+    const u = 30;
+    let h = '';
+    // isometric sketch
+    const iso = (x, y, z) => [70 + (x - z) * u * 0.87, 100 - y * u + (x + z) * u * 0.5];
+    const face = (pts, cls) => '<polygon points="' + pts.map((p) => iso(...p).map(r1).join(',')).join(' ') + '" class="' + cls + '"/>';
+    h += face([[0, 0, 0], [3, 0, 0], [3, 1, 0], [1.5, 1, 0], [1.5, 2, 0], [0, 2, 0]], 'obj');
+    h += face([[0, 2, 0], [1.5, 2, 0], [1.5, 2, -2], [0, 2, -2]], 'obj2') + face([[1.5, 1, 0], [3, 1, 0], [3, 1, -2], [1.5, 1, -2]], 'obj2');
+    h += face([[1.5, 1, 0], [1.5, 2, 0], [1.5, 2, -2], [1.5, 1, -2]], 'fillgold') + face([[3, 0, 0], [3, 1, 0], [3, 1, -2], [3, 0, -2]], 'fillgold');
+    h += D.text(70, 150, 'isometric', 't-m');
+    // views
+    const fx = 190, fy = 150, s = 22;
+    h += '<polygon points="' + [[0, 0], [3, 0], [3, 1], [1.5, 1], [1.5, 2], [0, 2]].map(([x, y]) => (fx + x * s) + ',' + (fy - y * s)).join(' ') + '" class="obj"/>' + D.text(fx + 1.5 * s, fy + 14, 'FRONT', 't-m');
+    h += '<rect x="' + fx + '" y="' + (fy - 2 * s - 18 - 2 * s) + '" width="' + 3 * s + '" height="' + 2 * s + '" class="obj"/>' + D.line(fx + 1.5 * s, fy - 4 * s - 18, fx + 1.5 * s, fy - 2 * s - 18, 'ln') + D.text(fx + 1.5 * s, fy - 4 * s - 26, 'TOP', 't-m');
+    h += '<rect x="' + (fx + 3 * s + 18) + '" y="' + (fy - 2 * s) + '" width="' + 2 * s + '" height="' + 2 * s + '" class="obj"/>' + D.line(fx + 3 * s + 18, fy - s, fx + 5 * s + 18, fy - s, 'ln') + D.text(fx + 4 * s + 18, fy + 14, 'RIGHT', 't-m');
+    return D.svg(340, 172, h, 'Stepped block in isometric view and its front, top and right orthographic views');
+  };
+
+  // conduction through a wall
+  D.wall = function () {
+    let h = '<rect x="120" y="20" width="70" height="140" class="fillgold" style="stroke:var(--fg);stroke-width:2"/>';
+    h += D.text(70, 40, 'T_hot', 'c6 t-it') + D.text(240, 40, 'T_cold', 'c2 t-it');
+    h += D.arrow(40, 90, 280, 90, 'c1') + D.text(160, 78, 'q', 'c1 t-it');
+    h += D.line(120, 172, 190, 172, 'thin') + D.line(120, 166, 120, 178, 'thin') + D.line(190, 166, 190, 178, 'thin') + D.text(155, 186, 'L', 't-it');
+    h += D.text(155, 130, 'κ, area A', 't-m');
+    return D.svg(310, 196, h, 'Heat conducting through a wall of thickness L from the hot side to the cold side');
+  };
+
+  // floating block with buoyant force
+  D.buoy = function () {
+    let h = '<rect x="20" y="70" width="280" height="110" class="fillsoft"/>' + D.line(20, 70, 300, 70, 'c2');
+    h += '<rect x="120" y="40" width="80" height="70" rx="4" class="obj"/>';
+    h += D.arrow(160, 75, 160, 150, 'c1') + D.text(172, 146, 'W = mg', 'c1 t-it', 'start') + D.arrow(150, 110, 150, 18, 'c3') + D.text(138, 20, 'F_B', 'c3 t-it', 'end');
+    h += D.text(250, 150, 'fluid ρ', 't-m');
+    return D.svg(320, 190, h, 'Floating block: buoyant force balances weight');
+  };
+
+  // pipe narrowing: continuity
+  D.pipe = function () {
+    let h = '<path d="M20 40 H140 L200 70 H310 M20 150 H140 L200 120 H310" class="ln"/>';
+    h += '<rect x="20" y="40" width="120" height="110" class="fillsoft"/><polygon points="140,40 200,70 200,120 140,150" class="fillsoft"/><rect x="200" y="70" width="110" height="50" class="fillsoft"/>';
+    h += D.arrow(40, 95, 100, 95, 'c2') + D.text(70, 80, 'v₁, A₁', 'c2 t-it') + D.arrow(220, 95, 300, 95, 'c1') + D.text(258, 84, 'v₂, A₂', 'c1 t-it');
+    return D.svg(330, 170, h, 'Pipe narrowing: the fluid speeds up where the area is smaller');
+  };
 })();
