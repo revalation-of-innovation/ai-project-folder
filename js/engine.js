@@ -219,7 +219,7 @@
       while (S.i < S.items.length) {
         const n = S.items[S.i];
         const left = S.items.slice(S.i + 1).filter((x) => CQ.isExercise(x)).length;
-        if (S.combo >= 4 && CQ.isExercise(n) && (n.lvl || 1) === 1 && !n.retry && !n.review && !n.stepping && left >= 3) {
+        if (S.combo >= 3 && CQ.isExercise(n) && (n.lvl || 1) === 1 && !n.retry && !n.review && !n.stepping && left >= 3) {
           S.i++; S.fast++; S.fastNow++;
         } else break;
       }

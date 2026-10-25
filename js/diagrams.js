@@ -385,7 +385,8 @@
   D.levels = function (o = {}) {
     const top = 22, bot = 200, Y = (n) => top + (bot - top) * (1 / (n * n));
     let h = D.line(70, top - 6, 70, bot + 6, 'thin') + D.text(36, top, 'E = 0', 't-m');
-    for (let n = 1; n <= 6; n++) { h += D.line(60, Y(n) + 0, 250, Y(n), n === 1 ? 'ln' : 'thin') + D.text(270, Y(n), 'n = ' + n, 't-m', 'start'); }
+    for (let n = 1; n <= 6; n++) { h += D.line(60, Y(n) + 0, 250, Y(n), n === 1 ? 'ln' : 'thin') + (n <= 3 ? D.text(262, Y(n) + (n === 3 ? 4 : 0), 'n = ' + n, 't-m', 'start') : ''); }
+    h += D.text(262, top - 8, 'n = 4, 5, … ∞', 't-m', 'start');
     (o.trans || []).forEach(([a, b], i) => {
       const x = 110 + i * 40;
       h += D.arrow(x, Y(a), x, Y(b), b < a ? 'c1' : 'c2', 9);
@@ -490,11 +491,11 @@
     const n1 = o.n1 || 12, n2 = o.n2 || 24, m = 3.2;
     const r1g = n1 * m / 2 + 6, r2g = n2 * m / 2 + 6;
     const cy = 20 + Math.max(r1g, r2g), c1 = 20 + r1g, c2 = c1 + r1g + r2g - 6;
-    const gear = (cx, r, n, lab, cls) => '<circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="' + r1(r) + '" class="' + cls + '" style="stroke-width:10;stroke-dasharray:' + r1((Math.PI * r) / n) + ' ' + r1((Math.PI * r) / n) + '"/><circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="' + r1(r - 5) + '" class="' + cls + '"/><circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="5" class="c4"/>' + D.text(cx, cy + 18, lab, 't-it');
+    const gear = (cx, r, n, lab, cls) => '<circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="' + r1(r) + '" class="' + cls + '" style="stroke-width:10;stroke-dasharray:' + r1((Math.PI * r) / n) + ' ' + r1((Math.PI * r) / n) + '"/><circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="' + r1(r - 5) + '" class="' + cls + '"/><circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="5" class="c4"/>' + D.text(cx, cy + r + 18, lab, 't-it');
     let h = gear(c1, r1g, n1, (o.l1 || 'N₁ = ' + n1), 'obj2') + gear(c2, r2g, n2, (o.l2 || 'N₂ = ' + n2), 'obj');
     h += '<path d="M' + r1(c1 - 16) + ' ' + r1(cy - r1g - 14) + ' A 26 26 0 0 1 ' + r1(c1 + 16) + ' ' + r1(cy - r1g - 14) + '" class="c2" style="fill:none;stroke-width:3"/>' + D.arrowA(c1 + 14, cy - r1g - 15, -30, 8, 'c2') + D.text(c1, cy - r1g - 34, o.w1 || 'ω_in', 'c2 t-it');
     h += '<path d="M' + r1(c2 + 16) + ' ' + r1(cy - r2g - 14) + ' A 26 26 0 0 0 ' + r1(c2 - 16) + ' ' + r1(cy - r2g - 14) + '" class="c1" style="fill:none;stroke-width:3"/>' + D.arrowA(c2 - 14, cy - r2g - 15, 210, 8, 'c1') + D.text(c2, cy - r2g - 34, o.w2 || 'ω_out', 'c1 t-it');
-    return D.svg(r1(c2 + r2g + 24), r1(cy + Math.max(r1g, r2g) + 14), h, 'Two meshing spur gears; they turn in opposite directions');
+    return D.svg(r1(c2 + r2g + 24), r1(cy + Math.max(r1g, r2g) + 32), h, 'Two meshing spur gears; they turn in opposite directions');
   };
 
   // compound gear train: gear 1 drives 2; 2 and 3 share a shaft; 3 drives 4
@@ -515,7 +516,7 @@
     h += '<circle cx="84" cy="70" r="4.5" class="c1"/>' + D.text(76, 58, 'yield S_y', 'c1', 'end');
     h += '<circle cx="236" cy="33" r="4.5" class="c4"/>' + D.text(236, 20, 'ultimate S_u', 'c4');
     h += '<text x="296" y="110" text-anchor="middle" class="t-m">fracture ×</text>';
-    h += D.text(58, 140, 'E = slope', 'c3', 'start') + D.text(150, oy - 10, 'plastic region', 't-m') + D.line(84, oy - 4, 84, oy + 4, 'thin');
+    h += D.text(74, 168, 'E = slope', 'c3', 'start') + D.text(150, oy - 10, 'plastic region', 't-m') + D.line(84, oy - 4, 84, oy + 4, 'thin');
     return D.svg(340, 200, h, 'Stress–strain curve showing elastic slope E, yield strength, ultimate strength and fracture');
   };
 

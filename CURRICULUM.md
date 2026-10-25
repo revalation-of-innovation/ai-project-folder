@@ -39,7 +39,7 @@ This follows **worked-example fading**, an approach from cognitive-load research
 ### 1.3 The flow engine (adaptive difficulty)
 - **Miss once:** you see the correct answer, a short explanation, and the full step-by-step solution. The question returns at the end of the lesson, and generated problems return **with new numbers**, so you can't pass by memorizing the answer.
 - **Miss twice in a row: Rescue.** The engine stops, shows the lesson's one-paragraph *Key Idea* again, and puts an easier stepping-stone question in front of you before continuing.
-- **Four right in a row: Fast track.** Remaining warm-up (L1) questions get skipped, so time goes to the harder material.
+- **Three right in a row: Fast track.** Remaining warm-up (L1) questions get skipped, so time goes to the harder material.
 - **Hints are free in learning mode.** The first hint is the first step of the solution. Using one only lowers the XP for that question.
 - **No hearts while learning.** In learning mode, mistakes are how you learn and cost you nothing. Hearts only appear in boss fights and Legendary runs, where the stakes are intentional.
 

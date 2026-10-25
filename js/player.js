@@ -94,10 +94,13 @@
     else if (it.t === 'example') body = renderExample(it);
     else if (it.t === 'rescue') body = renderRescue(it);
     else body = renderQuestion(it);
-    el.innerHTML = hud() + '<div class="stage" id="stage"><div class="card-wrap enter">' + body + '</div></div><footer class="checkbar" id="checkbar">' + footer(it) + '</footer>';
+    // slide in only when a new item appears, not when a tile tap re-renders the same one
+    const fresh = P._shown !== it;
+    P._shown = it;
+    const keepScroll = !fresh && $('#stage') ? $('#stage').scrollTop : 0;
+    el.innerHTML = hud() + '<div class="stage" id="stage"><div class="card-wrap' + (fresh ? ' enter' : '') + '">' + body + '</div></div><footer class="checkbar" id="checkbar">' + footer(it) + '</footer>';
     bindInputs(it);
-    const st0 = $('#stage');
-    st0.scrollTop = 0;
+    $('#stage').scrollTop = keepScroll;
   };
 
   function renderTeach(it) {
@@ -288,7 +291,7 @@
       jump: win ? ['You tested out!', 'Everything before this unit is unlocked.'] : ['Not this time', 'Brush up with the earlier lessons and try the jump again.'],
       review: ['Review done!', 'Every answer pushed those memories further out on the schedule.'],
       weak: ['Weak spots drilled', 'Missed ones stay in the drill until they stick.'],
-      exam: [R.score >= 85 ? 'Exam ready!' : R.score >= 70 ? 'Solid run' : 'Good scouting run', R.score >= 85 ? 'That\'s an A-range performance. Do one more run to confirm it.' : 'Work through the review below, drill your weak spots, then run it again.'],
+      exam: [R.score >= 85 ? 'A-range run!' : R.score >= 70 ? 'Solid run' : 'Good scouting run', R.score >= 85 ? 'Do one more run to confirm it, and keep your crowns and reviews up so the readiness meter follows.' : 'Work through the review below, drill your weak spots, then run it again.'],
     }[S.mode];
     let h = '<div class="results"><div class="res-hero">' + UI().nova(win ? 'cheer' : 'sad', 150) + '<h1>' + head[0] + '</h1><p>' + head[1] + '</p></div>';
     if (S.mode === 'exam') h += '<div class="exam-score ' + (R.score >= 85 ? 'good' : R.score >= 70 ? 'mid' : 'low') + '"><b>' + R.score + '%</b><span>Readiness now ' + CQ.store.readiness(S.exam) + '%</span></div>';
