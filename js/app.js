@@ -25,7 +25,12 @@
       store.flash = null;
       store.save();
     }
-    store.onChange(() => { if (!CQ.player.S) CQ.ui.render(); });
+    store.onChange(() => {
+      // a save synced from another device can arrive while the welcome screen is up
+      if (store.state.onboarded && document.querySelector('.onb-modal')) CQ.ui.closeModal();
+      CQ.ui.applyTheme();
+      if (!CQ.player.S) CQ.ui.render();
+    });
     store.cloud.init();
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) { store.rollDay(); if (!CQ.player.S) CQ.ui.render(); }
