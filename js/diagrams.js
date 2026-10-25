@@ -8,7 +8,9 @@
 
   D.svg = (w, h, inner, label) => '<svg class="dg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" role="img" aria-label="' + CQ.esc(label || 'diagram') + '">' + inner + '</svg>';
   D.line = (x1, y1, x2, y2, cls = 'ln') => '<line x1="' + r1(x1) + '" y1="' + r1(y1) + '" x2="' + r1(x2) + '" y2="' + r1(y2) + '" class="' + cls + '"/>';
-  D.text = (x, y, s, cls = '', anchor = 'middle') => '<text x="' + r1(x) + '" y="' + r1(y) + '" text-anchor="' + anchor + '" dominant-baseline="middle" class="' + cls + '">' + s + '</text>';
+  // "n_A" or "F_{g}" in labels becomes a real subscript
+  const subs = (s) => String(s).replace(/_\{?([A-Za-z0-9]+)\}?/g, '<tspan baseline-shift="sub" font-size="10">$1</tspan>');
+  D.text = (x, y, s, cls = '', anchor = 'middle') => '<text x="' + r1(x) + '" y="' + r1(y) + '" text-anchor="' + anchor + '" dominant-baseline="middle" class="' + cls + '">' + subs(s) + '</text>';
   // Arrow with a solid head; the shaft stops short so the tip stays sharp.
   D.arrow = function (x1, y1, x2, y2, cls = 'c1', head = 11) {
     const a = Math.atan2(y2 - y1, x2 - x1);
@@ -47,7 +49,7 @@
       h += D.text(ex + 8, (oy + ey) / 2, o.yl || 'A<tspan baseline-shift="sub" font-size="10">y</tspan> = A sin θ', 'c3', 'start');
     }
     h += D.arrow(ox, oy, ex, ey, 'c1');
-    h += D.text((ox + ex) / 2 - 14 * Math.sin(rad(th)), (oy + ey) / 2 - 14 * Math.cos(rad(th)), o.label || 'vec{A}'.replace(/vec\{(.)\}/, '$1⃗'), 'c1 t-it');
+    h += D.text((ox + ex) / 2 - 14 * Math.sin(rad(th)), (oy + ey) / 2 - 14 * Math.cos(rad(th)), o.label || 'A', 'c1 t-it');
     h += D.arc(ox, oy, 36, 0, th) + D.text(ox + 50 * Math.cos(rad(th / 2)), oy - 50 * Math.sin(rad(th / 2)), 'θ', 't-it');
     return D.svg(o.w || 340, 210, h, 'Vector A at angle θ with its x and y components');
   };
@@ -111,7 +113,7 @@
     const vx = v * Math.cos(rad(th)), vy = v * Math.sin(rad(th));
     h += D.arrow(x0, y0, x0 + vx, y0, 'c2') + D.arrow(x0 + vx, y0, x0 + vx, y0 - vy, 'c3');
     h += D.arrow(x0, y0, x0 + vx, y0 - vy, 'c1') + D.text(x0 + vx / 2 - 14, y0 - vy / 2 - 12, 'v₀', 'c1 t-it');
-    h += D.text(x0 + vx / 2, y0 + 14, 'v₀ cos θ', 'c2') + D.text(x0 + vx + 6, y0 - vy / 2, 'v₀ sin θ', 'c3', 'start');
+    h += D.text(x0 + vx / 2 + 6, y0 + 22, 'v₀ cos θ', 'c2') + D.text(x0 + vx + 6, y0 - vy / 2, 'v₀ sin θ', 'c3', 'start');
     h += D.line(x0 + Rp / 2, y0, x0 + Rp / 2, y0 - H, 'thin') + D.text(x0 + Rp / 2 + 10, y0 - H / 2, 'H', 't-it', 'start');
     h += D.arrow(x0 + Rp / 2, y0 - H, x0 + Rp / 2 + 50, y0 - H, 'c2') + D.text(x0 + Rp / 2 + 58, y0 - H, 'v = vₓ', 'c2', 'start');
     h += D.text(x0 + Rp, y0 + 16, 'R', 't-it');
@@ -140,10 +142,10 @@
     const cx = 130, cy = 112, R = 80, a = o.deg || 50;
     const px = cx + R * Math.cos(rad(a)), py = cy - R * Math.sin(rad(a));
     let h = '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" class="dash"/><circle cx="' + cx + '" cy="' + cy + '" r="3" class="c4"/>';
-    h += D.line(cx, cy, px, py, 'thin') + D.text((cx + px) / 2 - 10, (cy + py) / 2 + 10, 'R', 't-it');
+    h += D.line(cx, cy, px, py, 'thin') + D.text((cx + px) / 2 - 12 * Math.sin(rad(a)), (cy + py) / 2 - 12 * Math.cos(rad(a)), 'R', 't-it');
     h += '<circle cx="' + r1(px) + '" cy="' + r1(py) + '" r="10" class="obj"/>';
     h += D.arrowA(px, py, a + 90, 64, 'c2') + D.text(px + 78 * Math.cos(rad(a + 90)), py - 78 * Math.sin(rad(a + 90)), 'v', 'c2 t-it');
-    h += D.arrowA(px, py, a + 180, 52, 'c1') + D.text(px + 40 * Math.cos(rad(a + 180)) + 4, py - 40 * Math.sin(rad(a + 180)) + 14, 'a', 'c1 t-it', 'start');
+    h += D.arrowA(px, py, a + 180, 52, 'c1') + D.text(px + 34 * Math.cos(rad(a + 180)) + 12 * Math.sin(rad(a)), py - 34 * Math.sin(rad(a + 180)) + 12 * Math.cos(rad(a)), 'a', 'c1 t-it');
     return D.svg(270, 224, h, 'Object in uniform circular motion: velocity tangent, acceleration toward the center');
   };
 
@@ -267,5 +269,96 @@
     h += D.arc(ex, ey, 30, 0, phi) + D.text(ex + 44 * Math.cos(rad(phi / 2)), ey - 44 * Math.sin(rad(phi / 2)), 'φ', 't-it');
     h += D.line(px, py + 22, ex, py + 22, 'thin') + D.text((px + ex) / 2, py + 34, 'r', 't-it');
     return D.svg(350, 160, h, 'Force F applied at distance r from a pivot at angle φ');
+  };
+
+  /* horizontal beam with supports and loads.
+     supports: [{x: 0..1, type: 'pin'|'roller'|'fulcrum', label}], loads: [{x: 0..1, label, up}] */
+  D.beam = function (o = {}) {
+    const x0 = 40, x1 = 320, y = 92, X = (f) => x0 + f * (x1 - x0);
+    let h = '<rect x="' + x0 + '" y="' + (y - 7) + '" width="' + (x1 - x0) + '" height="14" rx="3" class="obj"/>';
+    (o.supports || []).forEach((s) => {
+      const x = X(s.x);
+      h += '<polygon points="' + x + ',' + (y + 7) + ' ' + (x - 13) + ',' + (y + 30) + ' ' + (x + 13) + ',' + (y + 30) + '" class="obj2"/>';
+      if (s.type === 'roller') h += '<circle cx="' + (x - 6) + '" cy="' + (y + 35) + '" r="4" class="obj"/><circle cx="' + (x + 6) + '" cy="' + (y + 35) + '" r="4" class="obj"/>';
+      h += D.line(x - 22, y + (s.type === 'roller' ? 40 : 31), x + 22, y + (s.type === 'roller' ? 40 : 31), 'ln');
+      if (s.label) h += D.arrow(x, y + 70, x, y + 12, 'c2') + D.text(x + 10, y + 64, s.label, 'c2 t-it', 'start');
+    });
+    (o.loads || []).forEach((l) => {
+      const x = X(l.x);
+      h += D.arrow(x, y - 64, x, y - 8, l.cls || 'c1') + D.text(x, y - 74, l.label, (l.cls || 'c1') + ' t-it');
+    });
+    (o.dims || []).forEach((d) => { h += D.line(X(d[0]), 168, X(d[1]), 168, 'thin') + D.line(X(d[0]), 162, X(d[0]), 174, 'thin') + D.line(X(d[1]), 162, X(d[1]), 174, 'thin') + D.text((X(d[0]) + X(d[1])) / 2, 184, d[2], 't-m'); });
+    return D.svg(360, 194, h, o.alt || 'Beam on supports with loads');
+  };
+
+  /* ladder against a frictionless wall */
+  D.ladder = function (o = {}) {
+    const th = o.deg || 60, Lp = 190, fx = 60, fy = 200;
+    const tx = fx + Lp * Math.cos(rad(th)), ty = fy - Lp * Math.sin(rad(th));
+    let h = '<rect x="' + (tx) + '" y="10" width="14" height="' + (fy - 10) + '" class="gnd"/>' + D.line(tx, 10, tx, fy) + D.ground(20, tx, fy);
+    h += D.line(fx, fy, tx, ty, 'ln') + D.line(fx + 6, fy + 2, tx + 4, ty + 3, 'thin');
+    const mx = (fx + tx) / 2, my = (fy + ty) / 2;
+    h += D.arrow(mx, my, mx, my + 56, 'c1') + D.text(mx + 10, my + 52, 'w', 'c1 t-it', 'start');
+    h += D.arrow(tx, ty, tx - 52, ty, 'c2') + D.text(tx - 60, ty - 10, 'n₂', 'c2 t-it');
+    h += D.arrow(fx, fy, fx, fy - 56, 'c2') + D.text(fx - 12, fy - 52, 'n₁', 'c2 t-it', 'end');
+    h += D.arrow(fx, fy, fx + 48, fy, 'c3') + D.text(fx + 30, fy + 14, 'f', 'c3 t-it');
+    h += D.arc(fx, fy, 30, 0, th) + D.text(fx + 44 * Math.cos(rad(th / 2)), fy - 44 * Math.sin(rad(th / 2)), 'θ', 't-it');
+    return D.svg(300, 220, h, 'Ladder leaning on a frictionless wall at angle θ');
+  };
+
+  /* rolling object on an incline */
+  D.roll = function (o = {}) {
+    const th = 22, t = rad(th);
+    let h = '<polygon points="20,190 320,190 320,' + r1(190 - 300 * Math.tan(t)) + '" class="gnd"/>' + D.line(20, 190, 320, 190 - 300 * Math.tan(t));
+    const P = [250, 190 - 230 * Math.tan(t)], n = [-Math.sin(t), -Math.cos(t)];
+    const c = [P[0] + 26 * n[0], P[1] + 26 * n[1]];
+    h += '<circle cx="' + r1(c[0]) + '" cy="' + r1(c[1]) + '" r="26" class="obj"/>' + D.line(c[0], c[1], c[0] + 26 * Math.cos(rad(50)), c[1] - 26 * Math.sin(rad(50)), 'thin');
+    h += D.arrowA(c[0] - 34, c[1] - 6, 180 + th, 50, 'c1') + D.text(c[0] - 70, c[1] + 26, 'v = Rω', 'c1');
+    h += D.text(300, 60, 'h', 't-it') + D.line(310, 190, 310, P[1], 'dash');
+    return D.svg(340, 206, h, 'Ball rolling without slipping down an incline');
+  };
+
+  /* satellite on a circular orbit */
+  D.orbit = function () {
+    const cx = 140, cy = 112, R = 86;
+    let h = '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" class="dash"/><circle cx="' + cx + '" cy="' + cy + '" r="30" class="obj2"/>' + D.text(cx, cy, 'M', 't-it');
+    const a = 35, px = cx + R * Math.cos(rad(a)), py = cy - R * Math.sin(rad(a));
+    h += '<circle cx="' + r1(px) + '" cy="' + r1(py) + '" r="8" class="obj"/>' + D.line(cx, cy, px, py, 'thin') + D.text((cx + px) / 2 - 6, (cy + py) / 2 - 12, 'r', 't-it');
+    h += D.arrowA(px, py, a + 90, 60, 'c2') + D.text(px + 72 * Math.cos(rad(a + 90)), py - 72 * Math.sin(rad(a + 90)), 'v', 'c2 t-it');
+    h += D.arrowA(px, py, a + 180, 40, 'c1') + D.text(px - 8, py + 34, 'F_g', 'c1 t-it');
+    return D.svg(290, 226, h, 'Satellite of mass m orbiting a planet of mass M at radius r');
+  };
+
+  /* sinusoidal wave with wavelength and amplitude marked */
+  D.wave = function (o = {}) {
+    const x0 = 30, W = 300, y0 = 90, A = 44, lam = o.lam || 150;
+    let d = '';
+    for (let x = 0; x <= W; x += 3) d += (x ? ' L' : 'M') + r1(x0 + x) + ' ' + r1(y0 - A * Math.sin((2 * Math.PI * x) / lam));
+    let h = D.line(x0 - 6, y0, x0 + W + 10, y0, 'thin') + '<path d="' + d + '" class="c2" style="fill:none;stroke-width:3"/>';
+    const p1 = x0 + lam / 4, p2 = p1 + lam;
+    h += D.line(p1, y0 - A - 12, p1, y0 - A - 2, 'thin') + D.line(p2, y0 - A - 12, p2, y0 - A - 2, 'thin') + D.arrow(p1 + 4, y0 - A - 7, p2 - 2, y0 - A - 7, 'thin', 7) + D.arrow(p2 - 4, y0 - A - 7, p1 + 2, y0 - A - 7, 'thin', 7) + D.text((p1 + p2) / 2, y0 - A - 20, 'λ', 't-it');
+    const px = x0 + (3 * lam) / 4;
+    h += D.arrow(px, y0, px, y0 + A, 'c1', 8) + D.text(px + 10, y0 + A / 2, 'A', 'c1 t-it', 'start');
+    if (o.dir) h += D.arrow(x0 + W - 70, 20, x0 + W - 10, 20, 'c4') + D.text(x0 + W - 40, 8, 'v', 'c4 t-it');
+    return D.svg(350, 160, h, 'Sinusoidal wave showing wavelength λ and amplitude A');
+  };
+
+  /* standing waves on a string fixed at both ends: harmonics 1..n */
+  D.standing = function (o = {}) {
+    const n = o.n || 3, x0 = 30, W = 280, rows = o.all ? n : 1;
+    let h = '';
+    for (let r = 0; r < rows; r++) {
+      const k = o.all ? r + 1 : n, y0 = 36 + r * 62, A = 20;
+      let d1 = '', d2 = '';
+      for (let x = 0; x <= W; x += 3) {
+        const yy = A * Math.sin((k * Math.PI * x) / W);
+        d1 += (x ? ' L' : 'M') + r1(x0 + x) + ' ' + r1(y0 - yy);
+        d2 += (x ? ' L' : 'M') + r1(x0 + x) + ' ' + r1(y0 + yy);
+      }
+      h += '<path d="' + d1 + '" class="c2" style="fill:none;stroke-width:2.5"/><path d="' + d2 + '" class="c2" style="fill:none;stroke-width:2.5;opacity:.45"/>';
+      h += '<rect x="' + (x0 - 8) + '" y="' + (y0 - 24) + '" width="8" height="48" class="gnd"/><rect x="' + (x0 + W) + '" y="' + (y0 - 24) + '" width="8" height="48" class="gnd"/>';
+      h += D.text(x0 + W + 22, y0, 'n = ' + k, 't-m', 'start');
+    }
+    return D.svg(370, 20 + rows * 62, h, 'Standing wave harmonics on a string fixed at both ends');
   };
 })();

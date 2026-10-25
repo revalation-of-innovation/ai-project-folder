@@ -591,6 +591,7 @@ $$ vec{v} = [[dx|dt]]î + [[dy|dt]]ĵ   ·   vec{a} = [[dvₓ|dt]]î + [[dvᵧ|d
       MC('A car moves at constant **speed** around a curve. Its acceleration is…', ['nonzero and perpendicular to its velocity', 'zero', 'parallel to its velocity', 'opposite to its velocity'], 'The direction is changing, so there is an acceleration. Perpendicular acceleration turns the velocity without changing its size.'),
       G('p.2dv'),
       TF('In 2D motion, the x and y components of motion can be treated as independent 1-D problems.', true, 'This is what makes projectile motion easy: only the time links them.'),
+      MC('A particle\'s position is r = (3t)î + (5 − t²)ĵ. Which statement about its acceleration is true?', ['It is constant: −2ĵ', 'It is zero', 'It points along +x', 'It grows with time'], 'vₓ = 3, vᵧ = −2t → aₓ = 0, aᵧ = −2. Constant and along −y.', { lvl: 2 }),
       G('p.2dv'),
     ]),
     L('p3l2', 'Horizontal Launch', {
