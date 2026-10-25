@@ -361,4 +361,112 @@
     }
     return D.svg(370, 20 + rows * 62, h, 'Standing wave harmonics on a string fixed at both ends');
   };
+
+  /* ===== chemistry ===== */
+  // orbital box diagram: subs = [['1s', 2], ['2s', 2], ['2p', 3]]
+  D.orbBoxes = function (subs, o = {}) {
+    const W = 24, gap = 16;
+    let x = 10, h = '';
+    subs.forEach(([lab, n]) => {
+      const cap = { s: 2, p: 6, d: 10, f: 14 }[lab.slice(-1)], k = cap / 2;
+      for (let i = 0; i < k; i++) {
+        const up = n > i ? 1 : 0, dn = n > k + i ? 1 : 0;
+        h += '<rect x="' + (x + i * W) + '" y="14" width="' + W + '" height="30" class="obj"/>';
+        if (up) h += D.arrow(x + i * W + (dn ? 8 : 12), 39, x + i * W + (dn ? 8 : 12), 19, 'c2', 6);
+        if (dn) h += D.arrow(x + i * W + 16, 19, x + i * W + 16, 39, 'c1', 6);
+      }
+      h += D.text(x + (k * W) / 2, 58, lab, 't-it');
+      x += k * W + gap;
+    });
+    return D.svg(x, 70, h, o.alt || 'Orbital box diagram');
+  };
+
+  // Bohr energy levels for hydrogen with optional transitions [[from, to], ...]
+  D.levels = function (o = {}) {
+    const top = 22, bot = 200, Y = (n) => top + (bot - top) * (1 / (n * n));
+    let h = D.line(70, top - 6, 70, bot + 6, 'thin') + D.text(36, top, 'E = 0', 't-m');
+    for (let n = 1; n <= 6; n++) { h += D.line(60, Y(n) + 0, 250, Y(n), n === 1 ? 'ln' : 'thin') + D.text(270, Y(n), 'n = ' + n, 't-m', 'start'); }
+    (o.trans || []).forEach(([a, b], i) => {
+      const x = 110 + i * 40;
+      h += D.arrow(x, Y(a), x, Y(b), b < a ? 'c1' : 'c2', 9);
+    });
+    h += D.text(30, bot, '−2.18', 't-m') + D.text(30, bot + 14, '×10⁻¹⁸ J', 't-m');
+    return D.svg(320, 222, h, 'Energy levels of the hydrogen atom');
+  };
+
+  // electromagnetic spectrum strip
+  D.spectrum = function () {
+    const bands = [['γ ray', 'c4'], ['X-ray', 'c4'], ['UV', 'c4'], ['visible', ''], ['IR', 'c6'], ['micro', 'c6'], ['radio', 'c6']];
+    let h = '<defs><linearGradient id="vis"><stop offset="0" stop-color="#7b3fe4"/><stop offset=".25" stop-color="#2f6bff"/><stop offset=".5" stop-color="#22c55e"/><stop offset=".75" stop-color="#facc15"/><stop offset="1" stop-color="#ef4444"/></linearGradient></defs>';
+    bands.forEach(([lab, cls], i) => {
+      const x = 10 + i * 48;
+      h += '<rect x="' + x + '" y="30" width="46" height="30" rx="4" ' + (lab === 'visible' ? 'fill="url(#vis)"' : 'class="' + (i < 3 ? 'fillsoft' : 'fillgold') + '"') + '/>' + D.text(x + 23, 74, lab, 't-m');
+    });
+    h += D.arrow(20, 14, 330, 14, 'c2', 8) + D.text(175, 6, 'wavelength λ increases →', 't-m');
+    h += D.arrow(330, 96, 20, 96, 'c1', 8) + D.text(175, 110, '← frequency ν and energy E increase', 't-m');
+    return D.svg(350, 118, h, 'Electromagnetic spectrum from gamma rays to radio');
+  };
+
+  // simplified periodic table (no f block); hl = {Sym: cls}; trend = 'radius' | 'ie' | 'en'
+  const PT = ['H', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'He',
+    'Li', 'Be', '', '', '', '', '', '', '', '', '', '', 'B', 'C', 'N', 'O', 'F', 'Ne',
+    'Na', 'Mg', '', '', '', '', '', '', '', '', '', '', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',
+    'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr',
+    'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe',
+    'Cs', 'Ba', 'La', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn'];
+  D.ptable = function (o = {}) {
+    const c = 19, x0 = 6, y0 = 6;
+    let h = '';
+    PT.forEach((sym, i) => {
+      if (!sym) return;
+      const col = i % 18, row = Math.floor(i / 18);
+      const block = col < 2 || sym === 'He' ? 'fillsoft' : col < 12 ? 'fillgold' : 'fillgood';
+      const hl = o.hl && o.hl[sym];
+      h += '<rect x="' + (x0 + col * c) + '" y="' + (y0 + row * c) + '" width="' + (c - 2) + '" height="' + (c - 2) + '" rx="3" class="' + (hl || block) + '"' + (hl ? ' style="stroke:none"' : '') + '/>';
+      h += '<text x="' + (x0 + col * c + (c - 2) / 2) + '" y="' + (y0 + row * c + (c - 2) / 2 + 1) + '" text-anchor="middle" dominant-baseline="middle" style="font-size:7.5px;font-weight:800' + (hl ? ';fill:#fff' : '') + '">' + sym + '</text>';
+    });
+    const W = x0 + 18 * c, H = y0 + 6 * c;
+    if (o.trend) {
+      const lab = { radius: 'atomic radius', ie: 'ionization energy', en: 'electronegativity', ea: 'electron affinity (more −)', metal: 'metallic character' }[o.trend];
+      const up = o.trend === 'radius' || o.trend === 'metal';
+      // arrows point toward increase
+      h += up ? D.arrow(W - 20, H + 14, 20, H + 14, 'c1', 8) : D.arrow(20, H + 14, W - 20, H + 14, 'c1', 8);
+      h += up ? D.arrow(W + 10, 12, W + 10, H - 4, 'c1', 8) : D.arrow(W + 10, H - 4, W + 10, 12, 'c1', 8);
+      h += D.text(W / 2, H + 28, lab + ' increases', 'c1');
+    }
+    return D.svg(W + 24, H + (o.trend ? 38 : 8), h, 'Periodic table' + (o.trend ? ' with the ' + o.trend + ' trend' : ''));
+  };
+
+  /* Lewis structure: atoms [{e, x, y, lp: [angles of lone pairs], fc: '+'|'−'|'2−'}], bonds [[i, j, order]] */
+  D.lewis = function (o) {
+    const A = o.atoms;
+    let h = '';
+    (o.bonds || []).forEach(([i, j, n]) => {
+      const a = A[i], b = A[j];
+      const dx = b.x - a.x, dy = b.y - a.y, Lb = Math.hypot(dx, dy), ux = dx / Lb, uy = dy / Lb, px = -uy, py = ux, sh = 14;
+      for (let k = 0; k < n; k++) { const off = (k - (n - 1) / 2) * 6; h += D.line(a.x + ux * sh + px * off, a.y + uy * sh + py * off, b.x - ux * sh + px * off, b.y - uy * sh + py * off, 'ln'); }
+    });
+    A.forEach((a) => {
+      h += '<text x="' + a.x + '" y="' + (a.y + 1) + '" text-anchor="middle" dominant-baseline="middle" class="at">' + a.e + '</text>';
+      (a.lp || []).forEach((ang) => {
+        const r = 18, cx = a.x + r * Math.cos(rad(ang)), cy = a.y - r * Math.sin(rad(ang)), tx = -Math.sin(rad(ang)), ty = -Math.cos(rad(ang));
+        h += '<circle cx="' + r1(cx + 4 * tx) + '" cy="' + r1(cy + 4 * ty) + '" r="2.6" class="lp"/><circle cx="' + r1(cx - 4 * tx) + '" cy="' + r1(cy - 4 * ty) + '" r="2.6" class="lp"/>';
+      });
+      if (a.fc) h += D.text(a.x + 16, a.y - 16, a.fc, 'c6 t-m', 'start');
+    });
+    if (o.bracket) { const xs = A.map((a) => a.x), ys = A.map((a) => a.y); const x1 = Math.min(...xs) - 34, x2 = Math.max(...xs) + 34, y1 = Math.min(...ys) - 34, y2 = Math.max(...ys) + 34; h += '<path d="M' + (x1 + 8) + ' ' + y1 + ' H' + x1 + ' V' + y2 + ' H' + (x1 + 8) + ' M' + (x2 - 8) + ' ' + y1 + ' H' + x2 + ' V' + y2 + ' H' + (x2 - 8) + '" class="ln"/>' + D.text(x2 + 6, y1 + 4, o.bracket, 't-it', 'start'); }
+    return D.svg(o.w || 240, o.h || 140, h, o.alt || 'Lewis structure');
+  };
+
+  /* enthalpy level diagram for an exothermic or endothermic reaction */
+  D.enthalpy = function (o = {}) {
+    const exo = o.exo !== false, yR = exo ? 50 : 140, yP = exo ? 140 : 50;
+    let h = D.arrow(30, 180, 30, 14, 'thin', 7) + D.text(42, 18, 'H', 't-it', 'start');
+    h += D.line(60, yR, 150, yR, 'ln') + D.text(105, yR - 14, o.r || 'reactants', 't-m');
+    h += D.line(190, yP, 280, yP, 'ln') + D.text(235, yP - 14, o.p || 'products', 't-m');
+    h += D.line(150, yR, 190, yR, 'dash');
+    h += D.arrow(170, yR, 170, yP, exo ? 'c1' : 'c2', 9) + D.text(176, (yR + yP) / 2, 'ΔH ' + (exo ? '< 0' : '> 0'), (exo ? 'c1' : 'c2'), 'start');
+    h += D.text(160, 196, exo ? 'exothermic: heat released' : 'endothermic: heat absorbed', 't-m');
+    return D.svg(300, 206, h, exo ? 'Exothermic enthalpy diagram' : 'Endothermic enthalpy diagram');
+  };
 })();

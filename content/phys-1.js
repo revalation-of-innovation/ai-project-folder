@@ -104,7 +104,7 @@
     const a = [R.int(-4, 5), R.int(-4, 5), R.int(-3, 4)], b = [R.int(-4, 5), R.int(-4, 5), R.int(-3, 4)];
     const d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
     const v = (x) => x[0] + 'î ' + (x[1] < 0 ? '− ' + -x[1] : '+ ' + x[1]) + 'ĵ ' + (x[2] < 0 ? '− ' + -x[2] : '+ ' + x[2]) + 'k̂';
-    return { t: 'num', q: 'A = ' + v(a) + ' and B = ' + v(b) + '. Find **A · B**.', a: d, unit: '', abs: 0.01, steps: ['A·B = AₓBₓ + AᵧBᵧ + A_zB_z', '= (' + a[0] + ')(' + b[0] + ') + (' + a[1] + ')(' + b[1] + ') + (' + a[2] + ')(' + b[2] + ') = **' + d + '**'], hint: 'Multiply matching components and add.' };
+    return { t: 'num', q: 'A = ' + v(a) + ' and B = ' + v(b) + '. Find **A · B**.', a: d, unit: '', abs: 0.01, steps: ['A·B = AₓBₓ + AᵧBᵧ + A_{z}B_{z}', '= (' + a[0] + ')(' + b[0] + ') + (' + a[1] + ')(' + b[1] + ') + (' + a[2] + ')(' + b[2] + ') = **' + d + '**'], hint: 'Multiply matching components and add.' };
   });
 
   CQ.gen('p.angleBetween', (R) => {
@@ -436,11 +436,11 @@ Adding is then just combining like terms.
     ]),
     L('p1l5', 'Dot & Cross Products', {
       goal: 'Compute dot and cross products and know what each one tells you.',
-      key: 'Dot product (a scalar): $A·B = AB cos φ = AₓBₓ + AᵧBᵧ + A_zB_z$. It is zero when the vectors are perpendicular. Cross product (a vector): $|A×B| = AB sin φ$, direction by the right-hand rule, zero when parallel, and $A×B = −B×A$. Unit vectors: î×ĵ = k̂, ĵ×k̂ = î, k̂×î = ĵ. Work uses the dot product; torque and angular momentum use the cross product.',
-      formulas: ['A·B = AB cos φ = AₓBₓ + AᵧBᵧ + A_zB_z', '|A × B| = AB sin φ', '(A × B)_z = AₓBᵧ − AᵧBₓ', 'î × ĵ = k̂, ĵ × k̂ = î, k̂ × î = ĵ'],
+      key: 'Dot product (a scalar): $A·B = AB cos φ = AₓBₓ + AᵧBᵧ + A_{z}B_{z}$. It is zero when the vectors are perpendicular. Cross product (a vector): $|A×B| = AB sin φ$, direction by the right-hand rule, zero when parallel, and $A×B = −B×A$. Unit vectors: î×ĵ = k̂, ĵ×k̂ = î, k̂×î = ĵ. Work uses the dot product; torque and angular momentum use the cross product.',
+      formulas: ['A·B = AB cos φ = AₓBₓ + AᵧBᵧ + A_{z}B_{z}', '|A × B| = AB sin φ', '(A × B)_z = AₓBᵧ − AᵧBₓ', 'î × ĵ = k̂, ĵ × k̂ = î, k̂ × î = ĵ'],
     }, [
       T('The dot product: how aligned are they?', `
-$$ vec{A}·vec{B} = AB cos φ = AₓBₓ + AᵧBᵧ + A_zB_z $$
+$$ vec{A}·vec{B} = AB cos φ = AₓBₓ + AᵧBᵧ + A_{z}B_{z} $$
 The result is a **scalar**. Parallel vectors give the maximum AB, perpendicular vectors give **0**, and opposite vectors give −AB.
 >> Work is a dot product: $W = vec{F}·vec{d}$. Only the part of the force along the motion does work.`),
       T('The cross product: how perpendicular are they?', `

@@ -18,8 +18,8 @@ CQ.store = store;
 
 const errors = [], warns = [];
 const err = (where, msg) => errors.push(where + ': ' + msg);
-const warn = (where, msg) => warns.push(where + ': ' + msg);
-const leftover = (html) => /\[\[|\]\]|√\{|vec\{|\$|\^\{|_\{|\*\*/.test(html.replace(/<[^>]+>/g, ''));
+const warn = (where, msg) => { const m = where + ': ' + msg; if (!warns.includes(m)) warns.push(m); };
+const leftover = (html) => /\[\[|\]\]|√\{|vec\{|\$|\^\{|_\{|\*\*|[A-Za-z]_/.test(html.replace(/<[^>]+>/g, ''));
 const checkText = (where, s) => { if (s && leftover(CQ.md(String(s)))) warn(where, 'unrendered markup in: ' + String(s).slice(0, 90)); };
 
 let nCards = 0, nGen = 0, nLessons = 0;

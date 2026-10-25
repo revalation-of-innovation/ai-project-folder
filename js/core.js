@@ -121,6 +121,8 @@
     let s = String(src);
     s = s.replace(/\^\{([^{}]*)\}/g, '<sup>$1</sup>');
     s = s.replace(/_\{([^{}]*)\}/g, '<sub>$1</sub>');
+    // shorthand subscripts: x_cm, P_A, v_esc
+    s = s.replace(/([^\s_<>])_([A-Za-z0-9]{1,8})(?![A-Za-z0-9])/g, '$1<sub>$2</sub>');
     s = s.replace(/\^(-?[0-9]+|[a-zA-Z])(?![a-zA-Z0-9])/g, '<sup>$1</sup>');
     s = s.replace(/vec\{([^{}]*)\}/g, '<span class="vec">$1</span>');
     for (let k = 0; k < 4; k++) {
